@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="icon" type="image/svg+xml" href="Logo.svg">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <title>EduFlow - Academic Resource & Assignment Management Platform</title>
     
     <!-- Tailwind CSS -->
@@ -35,7 +35,7 @@
             <div class="flex justify-between items-center h-20">
 
                 <!-- LOGO -->
-                <a href="#home" class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3">
                     <span class="text-3xl font-bold text-white">
                         <i class="fas fa-graduation-cap text-xl"></i> EduFlow
                     </span>
@@ -45,7 +45,7 @@
                 <div class="hidden md:flex gap-3">
 
                     <!--
-                    <button
+                    <a href="login.html"
                         class="px-5 py-2 rounded-xl
                         border border-white/100
                         bg-white/30
@@ -58,10 +58,10 @@
 
                         Login
 
-                    </button>
+                    </a>
                     -->
 
-                    <button
+                    <a href="signup.html"
                         class="px-5 py-2 rounded-xl
                         bg-white
                         text-emerald-600
@@ -71,7 +71,7 @@
 
                         Get Started
                         
-                    </button>
+                    </a>
 
                 </div>
 
@@ -87,8 +87,8 @@
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border border-emerald-100">
             
             <!-- Header -->
-            <div class="text-center mb-8 text-lg font-bold">
-                <p class="text-gray-500">Welcome back! Please enter your details.</p>
+            <div class="text-center mb-8 text-xl font-bold">
+                <p class="text-gray-500">Welcome back!</p>
             </div>
 
             <!-- Role -->
@@ -103,7 +103,7 @@
                 </button>
             </div>
 
-            <!-- Form Context Label -->
+            <!-- Label -->
             <div class="mb-4">
                 <span id="roleLabel" class="text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
                     Student Account
@@ -112,14 +112,14 @@
 
             <!-- Login Form -->
             <form onsubmit="handleLogin(event)" class="space-y-5">
-                <!-- Email Input -->
+                <!-- Username Input -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
-                            <i class="fas fa-envelope"></i>
+                            <i class="fas fa-user"></i>
                         </span>
-                        <input type="email" required placeholder="you@institution.edu" 
+                        <input type="text" required placeholder="Username" 
                             class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
                             <i class="fas fa-lock"></i>
                         </span>
-                        <input type="password" required placeholder="••••••••" 
+                        <input type="password" required placeholder="Password" 
                             class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
                     </div>
                 </div>
@@ -155,7 +155,7 @@
             <!-- Footer / Redirect -->
             <p class="text-center text-sm text-gray-600 mt-8">
                 Don't have an account? 
-                <a href="#" class="text-emerald-600 font-bold hover:underline">Get Started</a>
+                <a href="signup.html" class="text-emerald-600 font-bold hover:underline">Get Started</a>
             </p>
         </div>
 
@@ -185,11 +185,12 @@
             function handleLogin(event) {
                 event.preventDefault();
                 alert(`Logged in successfully as a ${currentRole}!`);
-                window.location.href = 'index.html'; // Redirect back to home
+                window.location.href = 'index.html';
             }
         </script>
 
     </div>
+    
     <!-- Footer -->
     <footer class="bg-black text-gray-300">
 

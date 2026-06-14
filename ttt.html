@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12th Class School Project - Geolocation API</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-between">
+
+    <main class="p-8 max-w-2xl mx-auto text-center space-y-4">
+        <h1 class="text-3xl font-bold text-blue-600">Computer Science Practical Project</h1>
+        <p class="text-gray-600">Topic: Implementing Browser Geolocation API with Interactive Maps.</p>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-left">
+            <span class="font-bold text-red-500">Project Note:</span> When the page loads, please click <strong>"Allow"</strong> on the browser location prompt to see the Geolocation API dynamically calculate your distance from our Bangalore office!
+        </div>
+    </main>
+
+    <footer class="bg-slate-950 text-white py-10 px-6 sm:px-12 mt-12">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-amber-400 text-xl font-bold tracking-wide">Our Bangalore Headquarters</h3>
+                    <p class="text-gray-300 font-semibold mt-1">Tech Hub India Pvt. Ltd.</p>
+                    <p class="text-gray-400 text-sm">MG Road, Bengaluru, Karnataka 560001</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg space-y-2">
+                    <h4 class="text-sm font-semibold uppercase tracking-wider text-blue-400">Geolocation API Status</h4>
+                    <p id="distance-text" class="text-gray-300 text-sm italic">Waiting for location permission...</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-gray-300 text-sm font-medium">Interactive Route Map</h3>
+                <div id="map" class="w-full h-64 rounded-lg shadow-lg border border-slate-800 z-0"></div>
+            </div>
+
+        </div>
+    </footer>
+    <script>
+        // 1. Fixed Company Coordinates (Bangalore)
+        const companyLat = 12.9716;
+        const companyLng = 77.5946;
+
+        // 2. Initialize the Map canvas pointing to Bangalore by default
+        const map = L.map('map').setView([companyLat, companyLng], 13);
+
+        // Load OpenStreetMap graphics
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Add a permanent marker pin for your company
+        const companyMarker = L.marker([companyLat, companyLng]).addTo(map)
+            .bindPopup('<b>Tech Hub India HQ</b><br>Our Fixed Bangalore Office.')
+            .openPopup();
+
+        // 3. THE GEOLOCATION API (Your Teacher's Core Requirement)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                // Success Callback Function
+                function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    // Calculate distance using the Haversine formula
+                    const distance = calculateDistance(userLat, userLng, companyLat, companyLng);
+                    
+                    // Update the UI text dynamically using Tailwind styled elements
+                    document.getElementById('distance-text').innerHTML = 
+                        `✨ <strong>Success:</strong> You are currently <span class="text-green-400 font-bold">${distance.toFixed(2)} km</span> away from our Bangalore office.`;
+
+                    // Add a second marker for the user's current location
+                    L.marker([userLat, userLng]).addTo(map)
+                        .bindPopup('<b>You Are Here!</b>')
+                        .openPopup();
+
+                    // Zoom the map out slightly so both pins fit nicely on screen
+                    const group = new L.featureGroup([L.marker([userLat, userLng]), L.marker([companyLat, companyLng])]);
+                    map.fitBounds(group.getBounds().pad(0.2));
+                },
+                // Error Callback Function (if user denies permission)
+                function(error) {
+                    document.getElementById('distance-text').innerHTML = 
+                        `❌ <strong>Permission Denied:</strong> Showing fixed Bangalore location only.`;
+                }
+            );
+        } else {
+            document.getElementById('distance-text').innerText = "Geolocation is not supported by this browser.";
+        }
+
+        // Mathematical function to calculate distance between two coordinates (Haversine Formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distance in km
+        }
+    </script>
+</body>
+</html>

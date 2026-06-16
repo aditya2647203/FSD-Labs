@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Mode</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center font-sans relative">
 
+    <link rel="icon" type="image/svg+xml" href="logo.svg?v=1">
+    <title>EduFlow - Focus Mode</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Smooth Scrolling -->
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center font-sans relative overflow-hidden">
+
+    <!-- Exit / Fullscreen -->
     <div class="absolute top-6 left-6 right-6 flex justify-between items-center text-sm">
-        <a href="index.html" class="text-slate-400 hover:text-white transition">← Exit to Hub</a>
+        <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-graduation-cap text-xl"></i> EduFlow - Exit</a>
         <button onclick="toggleFullscreen()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition">
             Toggle Fullscreen
         </button>
@@ -20,7 +38,7 @@
             Focus Session
         </span>
         
-        <h1 id="timerDisplay" class="text-8xl font-mono font-bold my-6 select-none tracking-tighter">25:00</h1>
+        <h1 id="timerDisplay" class="text-8xl font-mono font-bold my-6 select-none tracking-tighter">45:00</h1>
         
         <div class="flex gap-3 mb-8">
             <button id="actionBtn" onclick="toggleTimer()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg text-sm transition font-semibold">
@@ -34,26 +52,36 @@
         <div class="grid grid-cols-2 gap-4 border-t border-slate-900 pt-6 text-left">
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Study (Mins)</label>
-                <input type="number" id="studyInput" value="25" min="1" max="180" onchange="applyCustomDurations()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none">
+                <input type="number" id="studyInput" value="45" min="1" max="180" onchange="applyCustomDurations()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none">
             </div>
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Break (Mins)</label>
-                <input type="number" id="breakInput" value="5" min="1" max="60" onchange="applyCustomDurations()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none">
+                <input type="number" id="breakInput" value="15" min="1" max="60" onchange="applyCustomDurations()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none">
             </div>
         </div>
     </div>
 
+    <div>
+        <audio id="focusEndAudio" class="hidden" controls>
+            <source src="focus-end.mp3" type="audio/mpeg">
+        </audio>
+
+        <audio id="breakEndAudio" class="hidden" controls>
+            <source src="break-end.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Functions -->
     <script>
+        const focusEndAudio = document.getElementById('focusEndAudio');
+        const breakEndAudio = document.getElementById('breakEndAudio');
+
         let timer, soundTimer;
         let isRunning = false;
         let isBreakPhase = false;
         let timeRemaining = 25 * 60; 
 
-        // Audio API configuration targets (Uses local downloaded files)
-        const focusEndAudio = new Audio('focus-end.mp3');
-        const breakEndAudio = new Audio('break-end.mp3');
-
-        // Automatically prompt for permission alerts when the screen content loads
+        // API 
         document.addEventListener('DOMContentLoaded', () => {
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
@@ -62,8 +90,8 @@
 
         function applyCustomDurations() {
             if (isRunning) return; 
-            const studyMins = parseInt(document.getElementById('studyInput').value) || 25;
-            const breakMins = parseInt(document.getElementById('breakInput').value) || 5;
+            const studyMins = parseInt(document.getElementById('studyInput').value) || 45;
+            const breakMins = parseInt(document.getElementById('breakInput').value) || 15;
             timeRemaining = (isBreakPhase ? breakMins : studyMins) * 60;
             updateDisplay();
         }
@@ -72,7 +100,6 @@
             const btn = document.getElementById('actionBtn');
             const status = document.getElementById('timerStatus');
             
-            // Fullscreen trigger rules on first click handling
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => console.log("Handled."));
             }
@@ -123,15 +150,12 @@
             }
         }
 
-        // Reset Engine Logic
         function resetTimer() {
             clearInterval(timer);
             stopAlarmPlayback();
-            
             isRunning = false;
             isBreakPhase = false;
             
-            // Reset UI States
             const status = document.getElementById('timerStatus');
             const btn = document.getElementById('actionBtn');
             
@@ -139,27 +163,27 @@
             status.className = "text-xs uppercase tracking-widest text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-full";
             btn.innerText = "Click to Open & Start Focus";
             
-            // Recalculate back to base input levels
             applyCustomDurations();
         }
 
-        // Handles looping media pipelines precisely for 60 seconds
         function playAlarmLoop(audioElement) {
             stopAlarmPlayback(); 
             audioElement.currentTime = 0;
             audioElement.loop = true;
-            audioElement.play().catch(e => console.log("Audio waiting for system activation rules."));
+            audioElement.play().catch(e => console.log("Awaiting activation rules."));
             
             soundTimer = setTimeout(() => {
                 audioElement.pause();
                 audioElement.currentTime = 0;
             }, 60000);
         }
-
+        
         function stopAlarmPlayback() {
             clearTimeout(soundTimer);
             focusEndAudio.pause();
             breakEndAudio.pause();
+            focusEndAudio.currentTime = 0;
+            breakEndAudio.currentTime = 0;
         }
 
         function triggerNotification(title, msg) {
@@ -184,5 +208,6 @@
             }
         }
     </script>
+
 </body>
 </html>
